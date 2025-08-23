@@ -208,7 +208,7 @@ class VideoEditor(QMainWindow):
 
         export_group = QGroupBox("Export")
         ef = QFormLayout()
-        self.btn_export_mp4 = QPushButton(QIcon("resources/icons/export.png"), "Export MP4 (H.264 + AAC)…")
+        self.btn_export_mp4 = QPushButton(QIcon("resources/icons/export.png"), "Export MP4")
         self.btn_export_mp4.clicked.connect(lambda: self.export_as(ext="mp4"))
         ef.addRow(self.btn_export_mp4)
         export_group.setLayout(ef)
