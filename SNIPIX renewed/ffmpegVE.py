@@ -1,12 +1,11 @@
 # snipix_video_editor.py
-# PyQt6 video editor skeleton using FFmpeg for processing and Whisper (English) for captions.
-# - Operations: Open, Save As, Undo/Redo, Reset, Trim, Speed Change, Add Text (drawtext), Rotate, Remove Audio, Generate+Burn Captions (Whisper)
+# PyQt6 video editor skeleton using FFmpeg for processing 
+# - Operations: Open, Save As, Undo/Redo, Reset, Trim, Speed Change, Add Text (drawtext), Rotate, Remove Audio)
 # - Playback: QMediaPlayer + QVideoWidget
 # - Processing: FFmpeg subprocess (no MoviePy)
 # - History: versioned temp files for safe Undo/Redo
 # - Notes:
 #     * Requires FFmpeg installed and available on PATH.
-#     * Captions use Whisper (English only). Install via: pip install openai-whisper
 #     * Windows users may need a TTF font path when adding text (FFmpeg drawtext). The UI lets you pick a font file.
 
 import sys
@@ -25,12 +24,6 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
-
-# Optional: Whisper for captions (English only)
-try:
-    import whisper
-except Exception:
-    whisper = None
 
 
 # ----------------------------- Utility Events (for thread-safe UI updates) -----------------------------
@@ -199,10 +192,6 @@ class VideoEditor(QMainWindow):
         self.btn_remove_audio.clicked.connect(self.remove_audio)
         o.addRow(self.btn_remove_audio)
 
-        self.btn_captions = QPushButton(QIcon("resources/icons/captions.png"), "Generate English Captions")
-        self.btn_captions.clicked.connect(self.generate_and_burn_captions)
-        o.addRow(self.btn_captions)
-
         aops_group.setLayout(o)
         right.addWidget(aops_group)
 
@@ -294,7 +283,6 @@ class VideoEditor(QMainWindow):
         m_tools.addAction("Add Text Overlay…", self.add_text_overlay)
         m_tools.addAction("Rotate 90° CW", lambda: self.rotate_video(transpose=1))
         m_tools.addAction("Remove Audio", self.remove_audio)
-        m_tools.addAction("Generate English Captions", self.generate_and_burn_captions)
 
     # -------------------------------------- Status helpers --------------------------------------
 
@@ -658,104 +646,6 @@ class VideoEditor(QMainWindow):
             out_file
         ]
         self._run_ffmpeg_async(ff, success_msg="Audio removed", final_out=out_file)
-
-    def generate_and_burn_captions(self):
-        """
-        English-only captions:
-          1) Extract mono 16 kHz WAV via FFmpeg
-          2) Transcribe with Whisper (tiny/base/small – tiny used here for speed)
-          3) Save .srt
-          4) Burn into video with FFmpeg subtitles filter
-        """
-        if not self.current_path:
-            QMessageBox.warning(self, "No video", "Open a video first.")
-            return
-        if whisper is None:
-            QMessageBox.critical(self, "Whisper not installed",
-                                 "Please install Whisper first:\n    pip install openai-whisper")
-            return
-
-        # Choose model size (tiny/base/small/medium/large). Tiny is fastest; you can change this default.
-        model_name = "tiny"
-
-        wav_path = os.path.join(self.temp_dir, "audio_16k_mono.wav")
-        srt_path = os.path.join(self.temp_dir, "captions.srt")
-        out_file = self._temp_name("captioned", "mp4")
-
-        def worker():
-            # 1) Extract WAV
-            ok_wav, err_wav = self._run_ffmpeg_blocking([
-                "-y",
-                "-i", self.current_path,
-                "-vn",
-                "-ac", "1",             # mono
-                "-ar", "16000",         # 16 kHz
-                wav_path
-            ])
-            if not ok_wav:
-                self._post_event(False, f"Audio extract failed: {err_wav}")
-                return
-
-            # 2) Whisper (English only)
-            try:
-                model = whisper.load_model(model_name)
-                # Force English to avoid language detection overhead
-                result = model.transcribe(wav_path, language="en", task="transcribe", verbose=False)
-            except Exception as ex:
-                self._post_event(False, f"Whisper failed: {ex}")
-                return
-
-            # 3) Write SRT
-            try:
-                def srt_timestamp(t):
-                    h = int(t // 3600)
-                    m = int((t % 3600) // 60)
-                    s = int(t % 60)
-                    ms = int((t - int(t)) * 1000)
-                    return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
-
-                lines = []
-                idx = 1
-                for seg in result.get("segments", []):
-                    start = float(seg["start"])
-                    end = float(seg["end"])
-                    text = (seg.get("text") or "").strip()
-                    if not text:
-                        continue
-                    lines.append(f"{idx}")
-                    lines.append(f"{srt_timestamp(start)} --> {srt_timestamp(end)}")
-                    lines.append(text)
-                    lines.append("")  # blank line
-                    idx += 1
-
-                if not lines:
-                    self._post_event(False, "No captions generated from audio.")
-                    return
-
-                with open(srt_path, "w", encoding="utf-8") as f:
-                    f.write("\n".join(lines))
-            except Exception as ex:
-                self._post_event(False, f"Failed to write SRT: {ex}")
-                return
-
-            # 4) Burn SRT using FFmpeg
-            # Note: On Windows, paths must be escaped; simplest approach is to use absolute path and wrap in quotes.
-            ff = [
-                "-y",
-                "-i", self.current_path,
-                "-vf", f"subtitles='{srt_path}'",
-                "-c:v", "libx264", "-preset", "medium", "-crf", "18",
-                "-c:a", "aac", "-b:a", "192k",
-                out_file
-            ]
-            ok_burn, err_burn = self._run_ffmpeg_blocking(ff)
-            if not ok_burn:
-                self._post_event(False, f"Burning captions failed: {err_burn}")
-                return
-
-            self._post_event(True, "Captions generated & burned in", out_file)
-
-        self._start_worker(worker, "Generating captions...")
 
     # -------------------------------------- FFmpeg plumbing --------------------------------------
 
