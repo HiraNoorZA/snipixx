@@ -7,7 +7,7 @@ from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QPixmap, QIcon
 from ImageEditorScreen import ImageEditor
 from VideoEditorScreen import VideoEditor
-
+from styles.styles import SnipixStyles  # Import shared styles
 
 class OptionPane(QMainWindow):
     def __init__(self):
@@ -16,6 +16,10 @@ class OptionPane(QMainWindow):
         self.setWindowIcon(QIcon("resources/icons/SnipixLogo.png"))
         self.resize(1200, 768)
         self.setMinimumSize(800, 600)
+
+        # Dark mode state
+        self.is_dark_mode = False
+        self.setStyleSheet(self.get_option_pane_stylesheet())
 
         self.center_on_screen()
 
@@ -32,7 +36,8 @@ class OptionPane(QMainWindow):
         checkbox_layout = QHBoxLayout(checkbox_container)
         checkbox_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.dark_mode = QCheckBox("Dark Mode")
-        self.dark_mode.setChecked(False)
+        self.dark_mode.setChecked(self.is_dark_mode)
+        self.dark_mode.stateChanged.connect(self.apply_styles)
         checkbox_layout.addWidget(self.dark_mode)
         self.main_layout.addWidget(checkbox_container)
 
@@ -77,9 +82,45 @@ class OptionPane(QMainWindow):
         footer.setObjectName("footer")
         self.main_layout.addWidget(footer)
 
-        # Mode toggle
-        self.dark_mode.stateChanged.connect(self.apply_styles)
-        self.apply_styles()
+    def get_option_pane_stylesheet(self):
+        """Return stylesheet combining shared styles with OptionPane-specific styles."""
+        base_styles = SnipixStyles.get_stylesheet(self.is_dark_mode)
+        colors = (
+            SnipixStyles.DARK_BG, SnipixStyles.DARK_SURF, SnipixStyles.DARK_ACCENT,
+            SnipixStyles.DARK_TEXT, SnipixStyles.DARK_MUTED
+        ) if self.is_dark_mode else (
+            SnipixStyles.LIGHT_BG, SnipixStyles.LIGHT_SURF, SnipixStyles.LIGHT_ACCENT,
+            SnipixStyles.LIGHT_TEXT, SnipixStyles.LIGHT_MUTED
+        )
+        bg, surf, accent, text, muted = colors
+
+        specific_styles = f"""
+            QMainWindow {{ background: {bg}; }}
+            QLabel {{ color: {text}; }}
+            #welcome {{ font-size: 36px; font-weight: bold; }}
+            #subtitle {{ font-size: 18px; }}
+            #title {{ font-size: 24px; font-weight: bold; }}
+            #description {{ font-size: 16px; }}
+            #footer {{ padding: 10px; }}
+            QFrame {{
+                background-color: {surf};
+                border: 1px solid {muted};
+                border-radius: 10px;
+            }}
+            QFrame:hover {{ background-color: {'#292933' if self.is_dark_mode else '#f8fafc'}; }}
+            QPushButton {{
+                background: {accent};
+                color: {'#18181b' if self.is_dark_mode else '#111827'};
+                border: none;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: bold;
+            }}
+            QPushButton:hover {{ opacity: 0.95; }}
+            QPushButton:pressed {{ background: {muted}; }}
+            QCheckBox {{ color: {text}; }}
+        """
+        return base_styles + specific_styles
 
     def create_option_box(self, title, icon_path, description, target_class=None):
         box = QFrame()
@@ -139,60 +180,8 @@ class OptionPane(QMainWindow):
         self.move(x, y)
 
     def apply_styles(self):
-        if self.dark_mode.isChecked():
-            # Dark mode
-            self.setStyleSheet("""
-                QMainWindow { background: #18181b; }
-                QLabel { color: #e5e7eb; }
-                #welcome { font-size: 36px; font-weight: bold; }
-                #subtitle { font-size: 18px; }
-                #title { font-size: 24px; font-weight: bold; }
-                #description { font-size: 16px; }
-                #footer { padding: 10px; }
-                QFrame {
-                    background-color: #23232a;
-                    border: 1px solid #44444c;
-                    border-radius: 10px;
-                }
-                QFrame:hover { background-color: #292933; }
-                QPushButton {
-                    background: #cab4f5;
-                    color: #18181b;
-                    border: none;
-                    border-radius: 8px;
-                    font-size: 16px;
-                    font-weight: bold;
-                }
-                QPushButton:hover { opacity: 0.95; }
-                QPushButton:pressed { background: #44444c; }
-            """)
-        else:
-            # Light mode
-            self.setStyleSheet("""
-                QMainWindow { background: #e5f0fd; }
-                QLabel { color: #111827; }
-                #welcome { font-size: 36px; font-weight: bold; }
-                #subtitle { font-size: 18px; }
-                #title { font-size: 24px; font-weight: bold; }
-                #description { font-size: 16px; }
-                #footer { padding: 10px; }
-                QFrame {
-                    background-color: #ffffff;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 10px;
-                }
-                QFrame:hover { background-color: #f8fafc; }
-                QPushButton {
-                    background: #cab4f5;
-                    color: #111827;
-                    border: none;
-                    border-radius: 8px;
-                    font-size: 16px;
-                    font-weight: bold;
-                }
-                QPushButton:hover { opacity: 0.95; }
-                QPushButton:pressed { background: #e5e7eb; }
-            """)
+        self.is_dark_mode = self.dark_mode.isChecked()
+        self.setStyleSheet(self.get_option_pane_stylesheet())
 
     def open_editor(self, editor_class):
         try:
@@ -204,7 +193,6 @@ class OptionPane(QMainWindow):
 
     def sizeHint(self):
         return QSize(1200, 768)
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

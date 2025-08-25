@@ -15,10 +15,11 @@ from PIL import (
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QLabel, QPushButton, QFileDialog, QColorDialog,
     QHBoxLayout, QVBoxLayout, QSlider, QScrollArea, QMessageBox, QGroupBox, QInputDialog,
-    QMenuBar, QToolBar, QComboBox, QFormLayout, QSizePolicy
+    QMenuBar, QToolBar, QComboBox, QFormLayout, QSizePolicy, QCheckBox
 )
 from PyQt6.QtCore import Qt, QRect, QPoint, QSize
-from PyQt6.QtGui import QPixmap, QImage, QAction, QPainter, QPen, QIcon
+from PyQt6.QtGui import QPixmap, QImage, QAction, QPainter, QPen, QIcon,QKeySequence
+from styles.styles import SnipixStyles 
 
 
 # ------------------------------
@@ -39,84 +40,15 @@ class ImageEditor(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # Branding
         self.setWindowTitle("SNIPIX – Smart Image Editor")
         self.resize(1200, 800)
-        self.setWindowIcon(QIcon("resources/icons/SnipixLogo.png"))  
-        # ------- Light Theme (3–4 colors) -------
-        self.COLOR_BG = "#e5f0fd"       # app background (light)
-        self.COLOR_SURF = "#ffffff"     # surface panels
-        self.COLOR_ACCENT = "#cab4f5"   # primary accent blue
-        self.COLOR_TEXT = "#111827"     # dark text
-        self.COLOR_MUTED = "#e5e7eb"    # borders
-
-        self.setStyleSheet(f"""
-        QMainWindow {{
-            background: {self.COLOR_BG};
-            alignment: center;
-        }}
-        QMenuBar {{
-            background: {self.COLOR_SURF};
-            color: {self.COLOR_TEXT};
-            border-bottom: 1px solid {self.COLOR_MUTED};
-        }}
-        QMenuBar::item:selected {{
-            background: {self.COLOR_MUTED};
-        }}
-        QToolBar {{
-            background: {self.COLOR_SURF};
-            border: 0;
-        }}
-        QLabel {{
-            color: {self.COLOR_TEXT};
-        }}
-        QGroupBox {{
-            color: {self.COLOR_TEXT};
-            background: {self.COLOR_SURF};
-            border: 1px solid {self.COLOR_MUTED};
-            border-radius: 10px;
-            margin-top: 12px;
-        }}
-        QGroupBox::title {{
-            subcontrol-origin: margin;
-            left: 10px;
-            padding: 0 6px;
-        }}
-        QPushButton {{
-            background: {self.COLOR_ACCENT};
-            color: black;
-            border: none;     
-            qproperty-iconSize: 14px 14px;   
-            padding-left: 10px;   /* shifts text to the right */
-            padding: 8px 10px;
-            border-radius: 8px;
-        }}
-        QPushButton:hover {{ opacity: 0.90; }}
-        QPushButton:disabled {{ background: #cbd5e1; color: #6b7280; }}
-        QSlider::groove:horizontal {{
-            height: 6px;
-            background: {self.COLOR_MUTED};
-            border-radius: 3px;
-        }}
-        QSlider::handle:horizontal {{
-            width: 16px;
-            background: {self.COLOR_ACCENT};
-            border-radius: 8px;
-            margin: -6px 0;
-        }}
-        QScrollArea {{
-            background: {self.COLOR_SURF};
-            border: 1px solid {self.COLOR_MUTED};
-            border-radius: 10px;
-        }}
-        QComboBox {{
-            background: {self.COLOR_SURF};
-            border: 1px solid {self.COLOR_MUTED};
-            padding: 6px 8px;
-            border-radius: 6px;
-        }}
-        """)
-        # --- image state ---
+        self.setWindowIcon(QIcon("resources/icons/SnipixLogo.png"))
+        
+        # Dark mode state
+        self.is_dark_mode = False
+        self.setStyleSheet(SnipixStyles.get_stylesheet(self.is_dark_mode))
+        
+           # --- image state ---
         self.original_image: Image.Image | None = None
         self.current_image: Image.Image | None = None
         self.history: list[Image.Image] = []
@@ -186,6 +118,17 @@ class ImageEditor(QMainWindow):
     def create_left_panel(self):
         left = QVBoxLayout()
         left.setSpacing(12)
+
+        # Dark mode toggle
+        mode_group = QGroupBox("Display")
+        m = QVBoxLayout()
+        self.dark_mode_check = QCheckBox("Dark Mode")
+        self.dark_mode_check.setChecked(self.is_dark_mode)
+        self.dark_mode_check.stateChanged.connect(self.toggle_dark_mode)
+        m.addWidget(self.dark_mode_check)
+        mode_group.setLayout(m)
+        left.addWidget(mode_group)
+
 
         # Basic tools
         basic_group = QGroupBox("Basic Tools")
@@ -273,6 +216,19 @@ class ImageEditor(QMainWindow):
 
         left.addStretch()
         return left
+
+    def toggle_dark_mode(self):
+        self.is_dark_mode = self.dark_mode_check.isChecked()
+        self.setStyleSheet(SnipixStyles.get_stylesheet(self.is_dark_mode))
+
+    def back_to_menu(self):
+        from optionPane import OptionPane  # Local import to avoid circular dependency
+        try:
+            option_pane = OptionPane()
+            option_pane.show()
+            self.close()
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to return to menu: {e}")
 
     def create_right_panel(self):
         right = QVBoxLayout()
@@ -399,10 +355,9 @@ class ImageEditor(QMainWindow):
         act_export.triggered.connect(self.export_image)
         file_menu.addAction(act_export)
 
-        file_menu.addSeparator()
-        act_exit = QAction(QIcon("icons/exit.png"), "Exit", self)
-        act_exit.triggered.connect(self.close)
-        file_menu.addAction(act_exit)
+        back_action = QAction(QIcon("resources/icons/back.png"), "Back to Menu", self)
+        back_action.triggered.connect(self.back_to_menu)
+        file_menu.addAction(back_action)
 
         # --- Edit Menu ---
         edit_menu = menubar.addMenu("Edit")
