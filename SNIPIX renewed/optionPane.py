@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QPixmap, QIcon
 from ImageEditorScreen import ImageEditor
-from ffmpegVE import VideoEditor
+from VideoEditorScreen import VideoEditor
 
 
 class OptionPane(QMainWindow):
