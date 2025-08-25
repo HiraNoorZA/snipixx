@@ -1,7 +1,0 @@
-# ----- Custom Color Theme -----
-BG_COLOR = '#f0efe9'  # off-white
-PANEL_COLOR = '#8fc1ca'  # light blue
-BUTTON_COLOR = '#4ea3a6'  # medium teal
-TEXT_COLOR = '#0f6b70'  # dark teal for contrast
-SLIDER_COLOR = '#0f6b70'  # dark teal
-BUTTON_TEXT_COLOR = '#f0efe9'  # light color for button text
