@@ -95,7 +95,7 @@ class VideoEditor(QMainWindow):
 
         file_group = QGroupBox("File")
         f = QVBoxLayout()
-        self.btn_open = QPushButton(QIcon(".vscode/resources/icons/open.png"), "Open Video", clicked=self.open_video)
+        self.btn_open = QPushButton(QIcon(".vscode/resources/icons/video.png"), "Open Video", clicked=self.open_video)
         self.btn_save_as = QPushButton(QIcon(".vscode/resources/icons/save.png"), "Save As…", clicked=self.save_as)
         f.addWidget(self.btn_open)
         f.addWidget(self.btn_save_as)
