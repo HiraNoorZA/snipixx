@@ -42,7 +42,7 @@ class ImageEditor(QMainWindow):
 
         self.setWindowTitle("SNIPIX – Smart Image Editor")
         self.resize(1200, 800)
-        self.setWindowIcon(QIcon("resources/icons/SnipixLogo.png"))
+        self.setWindowIcon(QIcon(".vscode/resources/icons/SnipixLogo.png"))
         
         # Dark mode state
         self.is_dark_mode = False
@@ -134,23 +134,24 @@ class ImageEditor(QMainWindow):
         basic_group = QGroupBox("Basic Tools")
         b = QVBoxLayout()
 
-        self.btn_crop = QPushButton(QIcon("resources/icons/crop.png"), "Crop")
+        self.btn_crop = QPushButton(QIcon(".vscode/resources/icons/crop.png"), "Crop")
         self.btn_crop.clicked.connect(self.toggle_crop_mode)
         b.addWidget(self.btn_crop)
 
-        self.btn_rotate = QPushButton(QIcon("resources/icons/rotate.png"), "Rotate 90°")
+        self.btn_rotate = QPushButton(QIcon(".vscode/resources/icons/rotate.png"), "Rotate 90°")
         self.btn_rotate.clicked.connect(self.rotate_90)
         b.addWidget(self.btn_rotate)
 
-        self.btn_flip_h = QPushButton(QIcon("resources/icons/flipH.png"), "Flip Horizontal")
+        self.btn_flip_h = QPushButton(QIcon(".vscode/.vscode/resources/icons/flipH.png"), "Flip Horizontal")
+        self.btn_flip_h.setIconSize(QSize(24, 24))
         self.btn_flip_h.clicked.connect(self.flip_horizontal)
         b.addWidget(self.btn_flip_h)
 
-        self.btn_flip_v = QPushButton(QIcon("resources/icons/flipV.png"), "Flip Vertical")
+        self.btn_flip_v = QPushButton(QIcon(".vscode/resources/icons/flipV.png"), "Flip Vertical")
         self.btn_flip_v.clicked.connect(self.flip_vertical)
         b.addWidget(self.btn_flip_v)
 
-        self.btn_add_text = QPushButton(QIcon("resources/icons/addText.png"), "Add Text")
+        self.btn_add_text = QPushButton(QIcon(".vscode/resources/icons/addText.png"), "Add Text")
         self.btn_add_text.clicked.connect(self.add_text)
         b.addWidget(self.btn_add_text)
         
@@ -195,7 +196,7 @@ class ImageEditor(QMainWindow):
         # reset
         reset_group = QGroupBox("Reset Changes")
         r = QVBoxLayout()
-        self.btn_reset = QPushButton(QIcon("resources/icons/reset.png"), "Reset")
+        self.btn_reset = QPushButton(QIcon(".vscode/resources/icons/reset.png"), "Reset")
         self.btn_reset.clicked.connect(self.reset_image)
         r.addWidget(self.btn_reset)
         reset_group.setLayout(r)
@@ -205,8 +206,8 @@ class ImageEditor(QMainWindow):
 
         hist_group = QGroupBox("History")
         h = QVBoxLayout()
-        self.btn_undo = QPushButton(QIcon("resources/icons/undo.png"), "Undo")
-        self.btn_redo = QPushButton(QIcon("resources/icons/redo.png"), "Redo")
+        self.btn_undo = QPushButton(QIcon(".vscode/resources/icons/undo.png"), "Undo")
+        self.btn_redo = QPushButton(QIcon(".vscode/resources/icons/redo.png"), "Redo")
         self.btn_undo.clicked.connect(self.undo)
         self.btn_redo.clicked.connect(self.redo)
         h.addWidget(self.btn_undo)
@@ -237,15 +238,15 @@ class ImageEditor(QMainWindow):
         # Advanced Features
         adv_group = QGroupBox("Advanced Features")
         v = QVBoxLayout()
-        self.btn_auto = QPushButton(QIcon("resources/icons/enhance.png"), "Auto Enhance")
+        self.btn_auto = QPushButton(QIcon(".vscode/resources/icons/enhance.png"), "Auto Enhance")
         self.btn_auto.clicked.connect(self.auto_enhance)
         v.addWidget(self.btn_auto)
 
-        self.btn_bg_remove = QPushButton(QIcon("resources/icons/bgremove.png"), "Remove Background")
+        self.btn_bg_remove = QPushButton(QIcon(".vscode/resources/icons/bgremove.png"), "Remove Background")
         self.btn_bg_remove.clicked.connect(self.remove_background)
         v.addWidget(self.btn_bg_remove)
 
-        self.btn_bg_set = QPushButton(QIcon("resources/icons/bgColor.png"), "Set Background Color")
+        self.btn_bg_set = QPushButton(QIcon(".vscode/resources/icons/bgColor.png"), "Set Background Color")
         self.btn_bg_set.clicked.connect(self.set_custom_background)
         v.addWidget(self.btn_bg_set)
 
@@ -255,19 +256,19 @@ class ImageEditor(QMainWindow):
         # Filters
         filter_group = QGroupBox("Filters")
         f = QVBoxLayout()
-        self.btn_gray = QPushButton(QIcon("resources/icons/grayscale.png"), "Grayscale",self)
+        self.btn_gray = QPushButton(QIcon(".vscode/resources/icons/grayscale.png"), "Grayscale",self)
         self.btn_gray.clicked.connect(self.apply_grayscale)
         f.addWidget(self.btn_gray)
 
-        self.btn_sepia = QPushButton(QIcon("resources/icons/sepia.png"), "Sepia")
+        self.btn_sepia = QPushButton(QIcon(".vscode/resources/icons/sepia.png"), "Sepia")
         self.btn_sepia.clicked.connect(self.apply_sepia)
         f.addWidget(self.btn_sepia)
 
-        self.btn_blur = QPushButton(QIcon("resources/icons/blur.png"), "Blur…")
+        self.btn_blur = QPushButton(QIcon(".vscode/resources/icons/blur.png"), "Blur…")
         self.btn_blur.clicked.connect(self.blur_image)
         f.addWidget(self.btn_blur)
 
-        self.btn_invert = QPushButton(QIcon("resources/icons/invert.png"), "Invert")
+        self.btn_invert = QPushButton(QIcon(".vscode/resources/icons/invert.png"), "Invert")
         self.btn_invert.clicked.connect(self.apply_negative)
         f.addWidget(self.btn_invert)
 
@@ -286,7 +287,7 @@ class ImageEditor(QMainWindow):
         self.slider_quality.setValue(95)  # used for JPEG
         form.addRow("Quality", self.slider_quality)
 
-        self.btn_export = QPushButton(QIcon("resources/icons/export.png"), "Export")
+        self.btn_export = QPushButton(QIcon(".vscode/resources/icons/export.png"), "Export")
         self.btn_export.clicked.connect(self.export_image)
         form.addRow(self.btn_export)
 
@@ -340,50 +341,50 @@ class ImageEditor(QMainWindow):
         # --- File Menu ---
         file_menu = menubar.addMenu("File")
 
-        act_open = QAction(QIcon("resources/icons/open.png"), "Open…", self)
+        act_open = QAction(QIcon(".vscode/resources/icons/openImage.png"), "Open…", self)
         act_open.setShortcut("Ctrl+O")
         act_open.triggered.connect(self.open_image)
         file_menu.addAction(act_open)
 
-        act_save = QAction(QIcon("resources/icons/save.png"), "Save…", self)
+        act_save = QAction(QIcon(".vscode/resources/icons/save.png"), "Save…", self)
         act_save.setShortcut("Ctrl+S")
         act_save.triggered.connect(self.save_image)
         file_menu.addAction(act_save)
 
-        act_export = QAction(QIcon("resources/icons/export.png"), "Export…", self)
+        act_export = QAction(QIcon(".vscode/resources/icons/export.png"), "Export…", self)
         act_export.setShortcut("Ctrl+E")
         act_export.triggered.connect(self.export_image)
         file_menu.addAction(act_export)
 
-        back_action = QAction(QIcon("resources/icons/back.png"), "Back to Menu", self)
+        back_action = QAction(QIcon(".vscode/resources/icons/back.png"), "Back to Menu", self)
         back_action.triggered.connect(self.back_to_menu)
         file_menu.addAction(back_action)
 
         # --- Edit Menu ---
         edit_menu = menubar.addMenu("Edit")
-        act_undo = QAction(QIcon("resources/icons/undo.png"), "Undo", self, shortcut="Ctrl+Z", triggered=self.undo)
-        act_redo = QAction(QIcon("resources/icons/redo.png"), "Redo", self, shortcut="Ctrl+Y", triggered=self.redo)
+        act_undo = QAction(QIcon(".vscode/resources/icons/undo.png"), "Undo", self, shortcut="Ctrl+Z", triggered=self.undo)
+        act_redo = QAction(QIcon(".vscode/resources/icons/redo.png"), "Redo", self, shortcut="Ctrl+Y", triggered=self.redo)
         edit_menu.addAction(act_undo)
         edit_menu.addAction(act_redo)
 
         # --- Tools Menu ---
         tools_menu = menubar.addMenu("Tools")
-        tools_menu.addAction(QAction(QIcon("resources/icons/crop.png"), "Crop", self, triggered=self.toggle_crop_mode))
-        tools_menu.addAction(QAction(QIcon("resources/icons/rotate.png"), "Rotate 90° CW", self, triggered=self.rotate_90))
-        tools_menu.addAction(QAction(QIcon("resources/icons/flipH.png"), "Flip Horizontal", self, triggered=self.flip_horizontal))
-        tools_menu.addAction(QAction(QIcon("resources/icons/flipV.png"), "Flip Vertical", self, triggered=self.flip_vertical))
-        tools_menu.addAction(QAction(QIcon("resources/icons/addText.png"), "Add Text", self, triggered=self.add_text))
+        tools_menu.addAction(QAction(QIcon(".vscode/resources/icons/crop.png"), "Crop", self, triggered=self.toggle_crop_mode))
+        tools_menu.addAction(QAction(QIcon(".vscode/resources/icons/rotate.png"), "Rotate 90° CW", self, triggered=self.rotate_90))
+        tools_menu.addAction(QAction(QIcon(".vscode/resources/icons/flipH.png"), "Flip Horizontal", self, triggered=self.flip_horizontal))
+        tools_menu.addAction(QAction(QIcon(".vscode/resources/icons/flipV.png"), "Flip Vertical", self, triggered=self.flip_vertical))
+        tools_menu.addAction(QAction(QIcon(".vscode/resources/icons/addText.png"), "Add Text", self, triggered=self.add_text))
         tools_menu.addSeparator()
-        tools_menu.addAction(QAction(QIcon("resources/icons/enhance.png"), "Auto Enhance", self, triggered=self.auto_enhance))
-        tools_menu.addAction(QAction(QIcon("resources/icons/bgremove.png"), "Remove Background", self, triggered=self.remove_background))
-        tools_menu.addAction(QAction(QIcon("resources/icons/bgColor.png"), "Set Background Color", self, triggered=self.set_custom_background))
+        tools_menu.addAction(QAction(QIcon(".vscode/resources/icons/enhance.png"), "Auto Enhance", self, triggered=self.auto_enhance))
+        tools_menu.addAction(QAction(QIcon(".vscode/resources/icons/bgremove.png"), "Remove Background", self, triggered=self.remove_background))
+        tools_menu.addAction(QAction(QIcon(".vscode/resources/icons/bgColor.png"), "Set Background Color", self, triggered=self.set_custom_background))
 
         # --- Filters Menu ---
         filters_menu = menubar.addMenu("Filters")
-        filters_menu.addAction(QAction(QIcon("resources/icons/grayscale.png"), "Grayscale", self, triggered=self.apply_grayscale))
-        filters_menu.addAction(QAction(QIcon("resources/icons/sepia.png"), "Sepia", self, triggered=self.apply_sepia))
-        filters_menu.addAction(QAction(QIcon("resources/icons/blur.png"), "Blur…", self, triggered=self.blur_image))
-        filters_menu.addAction(QAction(QIcon("resources/icons/invert.png"), "Invert", self, triggered=self.apply_negative))
+        filters_menu.addAction(QAction(QIcon(".vscode/resources/icons/grayscale.png"), "Grayscale", self, triggered=self.apply_grayscale))
+        filters_menu.addAction(QAction(QIcon(".vscode/resources/icons/sepia.png"), "Sepia", self, triggered=self.apply_sepia))
+        filters_menu.addAction(QAction(QIcon(".vscode/resources/icons/blur.png"), "Blur", self, triggered=self.blur_image))
+        filters_menu.addAction(QAction(QIcon(".vscode/resources/icons/invert.png"), "Invert", self, triggered=self.apply_negative))
 
         # --- Help Menu ---
         help_menu = menubar.addMenu("Help")

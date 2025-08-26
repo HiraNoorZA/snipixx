@@ -25,7 +25,7 @@ class VideoEditor(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("SNIPIX – Video Editor")
-        self.setWindowIcon(QIcon("resources/icons/SnipixLogo.png"))
+        self.setWindowIcon(QIcon(".vscode/resources/icons/SnipixLogo.png"))
         self.resize(1200, 800)
 
         # Dark mode state
@@ -95,8 +95,8 @@ class VideoEditor(QMainWindow):
 
         file_group = QGroupBox("File")
         f = QVBoxLayout()
-        self.btn_open = QPushButton(QIcon("resources/icons/open.png"), "Open Video", clicked=self.open_video)
-        self.btn_save_as = QPushButton(QIcon("resources/icons/save.png"), "Save As…", clicked=self.save_as)
+        self.btn_open = QPushButton(QIcon(".vscode/resources/icons/open.png"), "Open Video", clicked=self.open_video)
+        self.btn_save_as = QPushButton(QIcon(".vscode/resources/icons/save.png"), "Save As…", clicked=self.save_as)
         f.addWidget(self.btn_open)
         f.addWidget(self.btn_save_as)
         file_group.setLayout(f)
@@ -104,9 +104,9 @@ class VideoEditor(QMainWindow):
 
         bops_group = QGroupBox("Basic Operations")
         b = QFormLayout()
-        self.btn_trim = QPushButton(QIcon("resources/icons/crop.png"), "Trim…", clicked=self.trim_video)
-        self.btn_speed = QPushButton(QIcon("resources/icons/speed.png"), "Change Speed…", clicked=self.change_speed)
-        self.btn_rotate = QPushButton(QIcon("resources/icons/rotate.png"), "Rotate 90° CW", clicked=lambda: self.rotate_video(transpose=1))
+        self.btn_trim = QPushButton(QIcon(".vscode/resources/icons/trim.png"), "Trim", clicked=self.trim_video)
+        self.btn_speed = QPushButton(QIcon(".vscode/resources/icons/speed.png"), "Change Speed", clicked=self.change_speed)
+        self.btn_rotate = QPushButton(QIcon(".vscode/resources/icons/rotate.png"), "Rotate 90° CW", clicked=lambda: self.rotate_video(transpose=1))
         b.addRow(self.btn_trim)
         b.addRow(self.btn_speed)
         b.addRow(self.btn_rotate)
@@ -115,9 +115,9 @@ class VideoEditor(QMainWindow):
 
         edit_group = QGroupBox("Edit")
         e = QVBoxLayout()
-        self.btn_undo = QPushButton(QIcon("resources/icons/undo.png"), "Undo", clicked=self.undo)
-        self.btn_redo = QPushButton(QIcon("resources/icons/redo.png"), "Redo", clicked=self.redo)
-        self.btn_reset = QPushButton(QIcon("resources/icons/reset.png"), "Reset", clicked=self.reset_to_original)
+        self.btn_undo = QPushButton(QIcon(".vscode/resources/icons/undo.png"), "Undo", clicked=self.undo)
+        self.btn_redo = QPushButton(QIcon(".vscode/resources/icons/redo.png"), "Redo", clicked=self.redo)
+        self.btn_reset = QPushButton(QIcon(".vscode/resources/icons/reset.png"), "Reset", clicked=self.reset_to_original)
         e.addWidget(self.btn_undo)
         e.addWidget(self.btn_redo)
         e.addWidget(self.btn_reset)
@@ -144,21 +144,21 @@ class VideoEditor(QMainWindow):
         right = QVBoxLayout()
         aops_group = QGroupBox("Adv. Operations")
         o = QFormLayout()
-        self.btn_remove_audio = QPushButton(QIcon("resources/icons/mute.png"), "Remove Audio", clicked=self.remove_audio)
+        self.btn_remove_audio = QPushButton(QIcon(".vscode/resources/icons/rmSound.png"), "Remove Audio", clicked=self.remove_audio)
         o.addRow(self.btn_remove_audio)
         aops_group.setLayout(o)
         right.addWidget(aops_group)
 
         filters_group = QGroupBox("Filters")
         f = QFormLayout()
-        self.btn_grayscale = QPushButton(QIcon("resources/icons/grayscale.png"), "Grayscale", clicked=self.apply_grayscale)
+        self.btn_grayscale = QPushButton(QIcon(".vscode/resources/icons/grayscale.png"), "Grayscale", clicked=self.apply_grayscale)
         f.addRow(self.btn_grayscale)
         filters_group.setLayout(f)
         right.addWidget(filters_group)
 
         export_group = QGroupBox("Export")
         ef = QFormLayout()
-        self.btn_export_mp4 = QPushButton(QIcon("resources/icons/export.png"), "Export MP4", clicked=lambda: self.export_as(ext="mp4"))
+        self.btn_export_mp4 = QPushButton(QIcon(".vscode/resources/icons/export.png"), "Export MP4", clicked=lambda: self.export_as(ext="mp4"))
         ef.addRow(self.btn_export_mp4)
         export_group.setLayout(ef)
         right.addWidget(export_group)
@@ -172,7 +172,7 @@ class VideoEditor(QMainWindow):
         self.media_player.setVideoOutput(self.video_widget)
         vbox.addWidget(self.video_widget, 1)
         bar = QHBoxLayout()
-        self.play_btn = QPushButton(QIcon("resources/icons/play.png"), "Play", clicked=self.toggle_play)
+        self.play_btn = QPushButton(QIcon(".vscode/resources/icons/play.png"), "Play", clicked=self.toggle_play)
         self.seek = QSlider(Qt.Orientation.Horizontal, sliderMoved=self._on_seek_slider)
         self.time_label = QLabel("00:00 / 00:00")
         bar.addWidget(self.play_btn)
@@ -186,7 +186,7 @@ class VideoEditor(QMainWindow):
 
         # File
         m_file = menubar.addMenu("&File")
-        act_open = QAction(QIcon("resources/icons/open.png"), "Open…", self)
+        act_open = QAction(QIcon("resources/icons/video.png"), "Open", self)
         act_open.setShortcut(QKeySequence("Ctrl+O"))
         act_open.triggered.connect(self.open_video)
 
