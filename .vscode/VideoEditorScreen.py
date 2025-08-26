@@ -1,15 +1,19 @@
+# snipix_video_editor.py
+# Simplified PyQt6 video editor using FFmpeg
+# Operations: Open, Save As, Undo/Redo, Reset, Trim, Speed Change, Rotate, Remove Audio, Grayscale, Export MP4
+# Requires: FFmpeg on PATH
+
 import sys, os, shutil, tempfile, threading, subprocess
 from datetime import datetime
 from PyQt6.QtCore import Qt, QTimer, QEvent, QUrl
-from PyQt6.QtGui import QIcon, QAction, QKeySequence
+from PyQt6.QtGui import QIcon, QKeySequence, QAction
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
-    QSlider, QGroupBox, QFormLayout, QFileDialog, QMessageBox, QDialog, QDoubleSpinBox,
-    QDialogButtonBox, QCheckBox
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QCheckBox,
+    QSlider, QGroupBox, QFormLayout, QFileDialog, QMessageBox, QDialog, QDoubleSpinBox, QDialogButtonBox
 )
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
-from styles.styles import SnipixStyles  # Import shared styles
+from styles.styles import SnipixStyles 
 
 class OpCompleteEvent(QEvent):
     TYPE = QEvent.Type(QEvent.registerEventType())
@@ -18,12 +22,12 @@ class OpCompleteEvent(QEvent):
         self.ok, self.msg, self.out_path = ok, msg, out_path
 
 class VideoEditor(QMainWindow):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.setWindowTitle("SNIPIX – Video Editor")
         self.setWindowIcon(QIcon("resources/icons/SnipixLogo.png"))
         self.resize(1200, 800)
-    
+
         # Dark mode state
         self.is_dark_mode = False
         self.setStyleSheet(SnipixStyles.get_stylesheet(self.is_dark_mode))
@@ -49,8 +53,8 @@ class VideoEditor(QMainWindow):
         central = QWidget()
         self.setCentralWidget(central)
         root = QHBoxLayout(central)
-        root.setContentsMargins(10, 10, 10, 10)
-        root.setSpacing(10)
+        root.setContentsMargins(12, 12, 12, 12)
+        root.setSpacing(12)
 
         root.addLayout(self._build_left_panel(), 1)
         root.addWidget(self._build_canvas(), 4)
@@ -121,13 +125,13 @@ class VideoEditor(QMainWindow):
         left.addWidget(edit_group)
         left.addStretch()
         return left
-    
+
     def toggle_dark_mode(self):
         self.is_dark_mode = self.dark_mode_check.isChecked()
         self.setStyleSheet(SnipixStyles.get_stylesheet(self.is_dark_mode))
 
     def back_to_menu(self):
-        from optionPane import OptionPane  # Lazy import to avoid circular dependency
+        from optionPane import OptionPane  # Local import to avoid circular dependency
         try:
             option_pane = OptionPane()
             option_pane.show()
@@ -194,15 +198,17 @@ class VideoEditor(QMainWindow):
         act_export.setShortcut(QKeySequence("Ctrl+E"))
         act_export.triggered.connect(lambda: self.export_as(ext="mp4"))
 
-        act_back = QAction(QIcon("resources/icons/back.png"), "Back to Menu", self)
-        act_back.setShortcut(QKeySequence("Ctrl+B"))
-        act_back.triggered.connect(self.back_to_menu)
+        act_exit = QAction("Exit", self)
+        act_exit.setShortcut(QKeySequence("Ctrl+Q"))
+        act_exit.triggered.connect(self.close)
 
-        for a in (act_open, act_save_as, act_export, act_back):
+        act_menu = QAction("Back to Home Screen", self)
+        act_menu.triggered.connect(self.back_to_menu)
+    
+        for a in (act_open, act_save_as, act_export, act_menu):
             m_file.addAction(a)
         m_file.addSeparator()
-        m_file.addAction(QAction("Exit", self, shortcut=QKeySequence("Ctrl+Q"), 
-        triggered=self.close))
+        m_file.addAction(act_exit)
 
         # Edit
         m_edit = menubar.addMenu("&Edit")
@@ -223,7 +229,7 @@ class VideoEditor(QMainWindow):
 
         # Tools
         m_tools = menubar.addMenu("&Tools")
-        m_tools.addAction("Trim", self.trim_video)
+        m_tools.addAction("Trim…", self.trim_video)
         m_tools.addAction("Change Speed…", self.change_speed)
         m_tools.addAction("Rotate 90° CW", lambda: self.rotate_video(transpose=1))
         m_tools.addAction("Remove Audio", self.remove_audio)
@@ -387,17 +393,18 @@ class VideoEditor(QMainWindow):
         layout.addRow(buttons)
         dialog.setLayout(layout)
         if dialog.exec() == QDialog.DialogCode.Accepted and end_spin.value() > start_spin.value():
+            start_time, end_time = start_spin.value(), end_spin.value()  # Capture values before dialog closes
             out_file = self._temp_name("trim", "mp4")
-            ff_try_copy = ["-y", "-ss", f"{start_spin.value()}", "-to", f"{end_spin.value()}", "-i", self.current_path, "-c", "copy", "-movflags", "+faststart", out_file]
+            ff_try_copy = ["-y", "-ss", f"{start_time}", "-to", f"{end_time}", "-i", self.current_path, "-c", "copy", "-movflags", "+faststart", out_file]
             def worker():
                 ok, _ = self._run_ffmpeg_blocking(ff_try_copy)
                 if not ok:
-                    ff_reencode = ["-y", "-ss", f"{start_spin.value()}", "-to", f"{end_spin.value()}", "-i", self.current_path, "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", out_file]
+                    ff_reencode = ["-y", "-ss", f"{start_time}", "-to", f"{end_time}", "-i", self.current_path, "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", out_file]
                     ok, err = self._run_ffmpeg_blocking(ff_reencode)
                     if not ok:
                         self._post_event(False, f"Trim failed: {err}")
                         return
-                self._post_event(True, f"Trimmed {start_spin.value():.2f}s → {end_spin.value():.2f}s", out_file)
+                self._post_event(True, f"Trimmed {start_time:.2f}s → {end_time:.2f}s", out_file)
             self._start_worker(worker, "Trimming...")
         elif end_spin.value() <= start_spin.value():
             QMessageBox.critical(self, "Invalid Range", "End must be greater than Start.")

@@ -114,7 +114,7 @@ class SnipixStyles:
                 border-radius: 6px;
             }}
             QDialog QPushButton:hover, QMessageBox QPushButton:hover, QFileDialog QPushButton:hover, QInputDialog QPushButton:hover, QColorDialog QPushButton:hover {{
-                opacity: 0.95;
+                opacity: 0.80;
             }}
             QDialog QLineEdit, QInputDialog QLineEdit, QFileDialog QLineEdit, QColorDialog QLineEdit {{
                 background: {surf};
