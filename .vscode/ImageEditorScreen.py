@@ -41,7 +41,7 @@ class ImageEditor(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("SNIPIX – Smart Image Editor")
-        self.resize(1200, 800)
+        self.resize(1200, 768)
         self.setWindowIcon(QIcon(".vscode/resources/icons/SnipixLogo.png"))
         
         # Dark mode state
@@ -69,6 +69,7 @@ class ImageEditor(QMainWindow):
         # drag & drop
         self.setAcceptDrops(True)
 
+        self.center_on_screen()
 
         # central layout
         central = QWidget()
@@ -230,6 +231,12 @@ class ImageEditor(QMainWindow):
             self.close()
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to return to menu: {e}")
+
+    def center_on_screen(self):
+        screen_geometry = QApplication.primaryScreen().geometry()
+        x = (screen_geometry.width() - self.width()) // 2
+        y = (screen_geometry.height() - self.height()) // 2
+        self.move(x, y)
 
     def create_right_panel(self):
         right = QVBoxLayout()

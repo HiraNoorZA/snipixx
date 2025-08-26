@@ -26,7 +26,7 @@ class VideoEditor(QMainWindow):
         super().__init__()
         self.setWindowTitle("SNIPIX – Video Editor")
         self.setWindowIcon(QIcon(".vscode/resources/icons/SnipixLogo.png"))
-        self.resize(1200, 800)
+        self.resize(1200, 768)
 
         # Dark mode state
         self.is_dark_mode = False
@@ -40,6 +40,8 @@ class VideoEditor(QMainWindow):
         self.redo_stack = []
         self.playing = False
         self.is_processing = False
+
+        self.center_on_screen()
 
         # Media player
         self.media_player = QMediaPlayer()
@@ -80,6 +82,11 @@ class VideoEditor(QMainWindow):
             QMessageBox.critical(self, "FFmpeg Not Found", 
                 "FFmpeg is required. Install it and add to PATH. Visit https://ffmpeg.org/download.html.")
 
+    def center_on_screen(self):
+        screen_geometry = QApplication.primaryScreen().geometry()
+        x = (screen_geometry.width() - self.width()) // 2
+        y = (screen_geometry.height() - self.height()) // 2
+        self.move(x, y)
     def _build_left_panel(self):
         left = QVBoxLayout()
 
