@@ -303,9 +303,9 @@ class ImageEditor(QMainWindow):
 
         # Canvas toolbar
         bar = QHBoxLayout()
-        self.btn_fit_actual = QPushButton(QIcon("icons/actual_size.png"), "Actual Size")
-        self.btn_fit_window = QPushButton(QIcon("icons/fit_window.png"), "Fit to Window")
-        self.btn_custom_size = QPushButton(QIcon("icons/custom_zoom.png"), "Custom Size…")
+        self.btn_fit_actual = QPushButton("Actual Size")
+        self.btn_fit_window = QPushButton("Fit to Window")
+        self.btn_custom_size = QPushButton("Custom Size")
         self.btn_fit_actual.clicked.connect(self.fit_actual)
         self.btn_fit_window.clicked.connect(self.fit_to_window)
         self.btn_custom_size.clicked.connect(self.custom_size)
