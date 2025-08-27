@@ -14,7 +14,7 @@ class OptionPane(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("SNIPIX – Editing Studio")
-        self.setWindowIcon(QIcon("resources/icons/SnipixLogo.png"))
+        self.setWindowIcon(QIcon(".vscode/resources/icons/SnipixLogo.png"))
         self.resize(1200, 768)
         self.setMinimumSize(800, 600)
 
